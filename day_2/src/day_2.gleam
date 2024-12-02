@@ -17,15 +17,16 @@ pub fn main() {
       |> list.map(fn(x) { int.parse(x) |> result.unwrap(0) })
     })
 
-  let _valid_reports = reports |> list.filter(fn(r) { report_valid(r) })
-  //io.debug(list.length(valid_reports))
+  let valid_reports = reports |> list.filter(fn(r) { report_valid(r) })
+  io.debug(list.length(valid_reports) - 1)
+  //my editer inserts empty line to the end of file.txt
 
   //part 2
   let count =
     reports
     |> list.filter(fn(r) { count(r) })
     |> list.length
-  io.debug(count)
+  io.debug(count - 1)
 }
 
 fn report_valid(report: List(Int)) {
