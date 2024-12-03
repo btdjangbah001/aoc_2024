@@ -41,8 +41,7 @@ fn count(report: List(Int)) {
 
 fn report_increasing(report, f: fn(Int, Int) -> Bool) {
   case report {
-    [] -> True
-    [_] -> True
+    [] | [_] -> True
     [x, y, ..rest] ->
       case
         int.absolute_value(x - y) > 3 || int.absolute_value(x - y) < 1 || x == y
@@ -57,16 +56,13 @@ fn report_increasing(report, f: fn(Int, Int) -> Bool) {
 
 fn can_be_fixed(report, f, fixed, previous) {
   case report, fixed, previous {
-    [], _, _ -> True
-    [_], _, _ -> True
+    [], _, _ | [_], _, _ -> True
     [x, y, ..rest], True, _ ->
       case
         int.absolute_value(x - y) > 3 || int.absolute_value(x - y) < 1 || x == y
       {
         True -> False
-        False -> {
-          f(x, y) && report_increasing([y, ..rest], f)
-        }
+        False -> f(x, y) && report_increasing([y, ..rest], f)
       }
     [x, y, ..rest], False, 0 ->
       case
