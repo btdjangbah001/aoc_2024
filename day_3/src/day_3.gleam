@@ -73,7 +73,6 @@ fn skip_invalid_instruction(parser: Parser, rest: String) -> Parser {
 fn try_read_instruction(parser: Parser, rest: String, acc: String) -> Parser {
   case rest |> string.pop_grapheme {
     Ok(#(")", rest)) -> {
-      //io.debug(parser)
       let assert Ok(re) = regexp.from_string("\\d{1,3},\\d{1,3}")
       case regexp.check(re, acc) {
         True -> Parser(input: rest, parsed: [acc, ..parser.parsed])

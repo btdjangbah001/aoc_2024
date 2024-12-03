@@ -6,7 +6,7 @@ import gleam/string
 import simplifile
 
 pub fn main() {
-  //part 1
+  //Part 1.
   let assert Ok(input) = simplifile.read("file.txt")
   let reports =
     input
@@ -21,35 +21,31 @@ pub fn main() {
   io.debug(list.length(valid_reports) - 1)
   //my editer inserts empty line to the end of file.txt
 
-  //part 2
+  //Part 2.
   let count =
     reports
-    |> list.filter(fn(r) { count(r) })
+    |> list.filter(fn(r) { fix(r) })
     |> list.length
   io.debug(count - 1)
 }
 
 fn report_valid(report: List(Int)) {
-  report_increasing(report, fn(x, y) { x > y })
-  || report_increasing(report, fn(x, y) { x < y })
+  report_ordered(report, fn(x, y) { x > y })
+  || report_ordered(report, fn(x, y) { x < y })
 }
 
-fn count(report: List(Int)) {
+fn fix(report: List(Int)) {
   can_be_fixed(report, fn(x, y) { x > y }, False, 0)
   || can_be_fixed(report, fn(x, y) { x < y }, False, 0)
 }
 
-fn report_increasing(report, f: fn(Int, Int) -> Bool) {
+fn report_ordered(report, f: fn(Int, Int) -> Bool) {
   case report {
     [] | [_] -> True
     [x, y, ..rest] ->
-      case
-        int.absolute_value(x - y) > 3 || int.absolute_value(x - y) < 1 || x == y
-      {
+      case valid_step(x, y) {
         True -> False
-        False -> {
-          f(x, y) && report_increasing([y, ..rest], f)
-        }
+        False -> f(x, y) && report_ordered([y, ..rest], f)
       }
   }
 }
@@ -58,16 +54,12 @@ fn can_be_fixed(report, f, fixed, previous) {
   case report, fixed, previous {
     [], _, _ | [_], _, _ -> True
     [x, y, ..rest], True, _ ->
-      case
-        int.absolute_value(x - y) > 3 || int.absolute_value(x - y) < 1 || x == y
-      {
+      case valid_step(x, y) {
         True -> False
-        False -> f(x, y) && report_increasing([y, ..rest], f)
+        False -> f(x, y) && report_ordered([y, ..rest], f)
       }
     [x, y, ..rest], False, 0 ->
-      case
-        int.absolute_value(x - y) > 3 || int.absolute_value(x - y) < 1 || x == y
-      {
+      case valid_step(x, y) {
         True ->
           can_be_fixed([y, ..rest], f, True, x)
           || can_be_fixed([x, ..rest], f, True, x)
@@ -81,9 +73,7 @@ fn can_be_fixed(report, f, fixed, previous) {
         }
       }
     [x, y, ..rest], False, previous ->
-      case
-        int.absolute_value(x - y) > 3 || int.absolute_value(x - y) < 1 || x == y
-      {
+      case valid_step(x, y) {
         True ->
           can_be_fixed([previous, y, ..rest], f, True, x)
           || can_be_fixed([previous, x, ..rest], f, True, previous)
@@ -97,4 +87,8 @@ fn can_be_fixed(report, f, fixed, previous) {
         }
       }
   }
+}
+
+fn valid_step(x, y) {
+  int.absolute_value(x - y) > 3 || int.absolute_value(x - y) < 1 || x == y
 }
